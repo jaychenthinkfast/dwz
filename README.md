@@ -1,6 +1,6 @@
 # 基于Swoole HttpServer的短网址服务
 
-[TOC]
+
 ##程序启动
 ``` bash
 composer install //安装项目依赖
@@ -13,6 +13,32 @@ http://v2.dwz.wf //短网址生成页
 http://v2.dwz.wf/Index/shorten?longurl=http://chenjie.info //短网址生成接口
 http://v2.dwz.wf/mO //短网址跳转 
 ```
+
+##默认配置
+``` bash
+//DB配置（根据实际修改）
+define('DB_TYPE', 'mysql');
+define('DB_NAME', 'short_url');
+define('DB_USER', 'root');
+define('DB_PASSWORD', 'devop');
+define('DB_HOST', 'localhost');
+define('DB_TABLE', 'shortenedurls');
+
+//是否统计访问次数
+define('TRACK', TRUE);
+
+//是否检查长网址可访问
+define('CHECK_URL', TRUE);
+
+//hashids的可选字符串集
+define('ALLOWED_CHARS', '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ');
+
+//是否缓存
+define('CACHE', TRUE);
+
+//缓存文件夹目录
+define('CACHE_DIR', dirname(__FILE__) . '/cache/');
+``` 
 
 ##数据库SQL
 ``` bash
