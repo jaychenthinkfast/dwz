@@ -42,18 +42,16 @@ define('CACHE_DIR', dirname(__FILE__) . '/cache/');
 
 ##数据库SQL
 ``` bash
-CREATE TABLE IF NOT EXISTS `shortenedurls` (
-  `id` int(10) unsigned NOT NULL,
-  `long_url` varchar(255) NOT NULL,
-  `created` int(10) unsigned NOT NULL,
-  `creator` char(15) NOT NULL,
-  `referrals` int(10) unsigned NOT NULL DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-ALTER TABLE `shortenedurls`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `long` (`long_url`),
-  ADD KEY `referrals` (`referrals`);
+CREATE TABLE `shortenedurls` (
+   `id` int(10) unsigned NOT NULL AUTO_INCREMENT,
+   `long_url` varchar(255) NOT NULL,
+   `created` int(10) unsigned NOT NULL,
+   `creator` char(15) NOT NULL,
+   `referrals` int(10) unsigned NOT NULL DEFAULT '0',
+   PRIMARY KEY (`id`),
+   UNIQUE KEY `long` (`long_url`),
+   KEY `referrals` (`referrals`)
+ ) ENGINE=InnoDB DEFAULT CHARSET=utf8
 ``` 
 
 ##NGINX参考配置
