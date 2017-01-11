@@ -44,10 +44,9 @@ EOT;
                 $dbh = new \PDO(DB_TYPE.':host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD);
                 $dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             } catch (\PDOException $e) {
-                print "Erreur !: " . $e->getMessage() . "<br/>";
-                die();
+                return "数据库连接错误";
             }
-            // check if the URL is valid
+            // 检查url是否有效
             if(CHECK_URL) {
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, $url_to_shorten);
@@ -55,22 +54,22 @@ EOT;
                 $response = curl_exec($ch);
                 $response_status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
                 curl_close($ch);
-                if($response_status == '404') {
-                    die('Not a valid URL');
+                if($response_status != '200') {
+                    return '这是一个无效的网址';
                 }
             }
 
             $stmt = $dbh->prepare('SELECT id FROM '.DB_TABLE.' WHERE long_url=?');
 
-            // check if the URL has already been shortened
+            // 检测url是否被缩短过
             $stmt->execute(array($url_to_shorten));
             $tmp = $stmt->fetch(\PDO::FETCH_NUM);
             $already_shortened = $tmp[0];
             if(!empty($already_shortened)) {
-                // URL has already been shortened
+
                 $shortened_url = $this->getShortenedURLFromID($already_shortened);
             } else {
-                // URL not in database, insert
+                // url不在数据库
                 try {
                     $stmt2 = $dbh->prepare('INSERT INTO '.DB_TABLE." (long_url, created, creator) VALUES (?,?,?)");
                     $stmt2->execute(array($url_to_shorten, time(), $request->server['remote_addr']));
@@ -78,10 +77,10 @@ EOT;
                     $tmp = $stmt->fetch(\PDO::FETCH_NUM);
                     $shortened_url = $this->getShortenedURLFromID($tmp[0]);
                     if(empty($shortened_url)) {
-                        die('Insertion ratee');
+                        return "数据库入库失败";
                     }
                 } catch (\Exception $e) {
-                    echo "Failed: " . $e->getMessage();
+                    return "数据库错误";
                 }
             }
             return 'http://'.$request->header['host'] .'/'. $shortened_url;
@@ -96,8 +95,7 @@ EOT;
             $dbh = new \PDO(DB_TYPE.':host='.DB_HOST.';dbname='.DB_NAME, DB_USER, DB_PASSWORD);
             $dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
-            print "Erreur !: " . $e->getMessage() . "<br/>";
-            die();
+            return "数据库连接错误";
         }
         if(CACHE) {
             $long_url = @file_get_contents(CACHE_DIR . $shortened_id);
@@ -112,8 +110,7 @@ EOT;
                     fwrite($handle, $long_url);
                     fclose($handle);
                 } catch (\Exception $e) {
-                    echo "Failed " . $e->getMessage();
-                    exit;
+                    return "数据库错误";
                 }
             }
         } else {
@@ -123,7 +120,7 @@ EOT;
                 $tmp = $stmt->fetch(\PDO::FETCH_NUM);
                 $long_url = $tmp[0];
             } catch (\Exception $e) {
-                echo "Failed " . $e->getMessage();
+                return "数据库错误";
             }
         }
 

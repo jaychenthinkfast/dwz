@@ -65,8 +65,10 @@ $serv->on('Request', function($request, $response) {
     }
     if($result == 'Ctrl not found'){
         $bash_url = $request->header['host'];
-        $response->status(301);
-        $response->header('Location', 'http://'.$bash_url.'/Index/redirect?url='.$path_info[1]);
+        if($path_info[1] != 'favicon.ico') {
+            $response->status(301);
+            $response->header('Location', 'http://' . $bash_url . '/Index/redirect?url=' . $path_info[1]);
+        }
     }
     $response->end($result);
 });
